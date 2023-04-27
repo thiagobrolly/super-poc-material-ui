@@ -1,4 +1,4 @@
-import { useState, FormEvent, ChangeEvent } from 'react';
+import { useState, FormEvent } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/auth';
 import {
@@ -7,7 +7,6 @@ import {
   TextField,
   Typography,
   Link as LinkBase,
-  CircularProgress,
 } from '@mui/material';
 
 import Logo from '../assets/logo.svg';
@@ -18,49 +17,18 @@ import Logo from '../assets/logo.svg';
 // lg, large: 1200px
 // xl, extra-large: 1536px
 
-export function SignIn() {
-  const [code, setCode] = useState('');
-  const [phone, setPhone] = useState('');
-  const [inputCode, setInputCode] = useState(false);
+export function SignInEmailPassword() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
 
-  const { handleSendCode, handleVerifyCode, loadingAuth } = useAuth();
+  const { signIn, loadingAuth } = useAuth();
 
-  async function handleOTP(e: FormEvent) {
+  async function handleSignIn(e: FormEvent) {
     e.preventDefault();
 
-    await handleSendCode(phone).then(() => setInputCode(true));
-  }
+    const data = { email, password };
 
-  async function handleVerify(e: FormEvent) {
-    e.preventDefault();
-
-    await handleVerifyCode(code);
-  }
-
-  function handlePhoneChange(event: ChangeEvent<HTMLInputElement>) {
-    const notFormattedCpf = event.target.value;
-    const formattedCpf = notFormattedCpf
-      .replace(/\D/g, '')
-      .replace(/(\d{2})(\d)/, '($1) $2')
-      .replace(/(\d{5})(\d)/, '$1-$2')
-      .replace(/(-\d{4})\d+?$/, '$1');
-    setPhone(formattedCpf);
-  }
-
-  function handleCodeChange(event: ChangeEvent<HTMLInputElement>) {
-    const notFormattedCpf = event.target.value;
-    const formattedCpf = notFormattedCpf
-      .replace(/\D/g, '')
-      .replace(/(\d{6})\d+?$/, '$1');
-    setCode(formattedCpf);
-  }
-
-  function handleButtonText() {
-    if (inputCode) {
-      return 'Entrar';
-    } else {
-      return 'Entre com seu número';
-    }
+    await signIn(data);
   }
 
   return (
@@ -104,32 +72,26 @@ export function SignIn() {
             display={'flex'}
             flexDirection={'column'}
             gap={'.75rem'}
-            onSubmit={!inputCode ? handleOTP : handleVerify}
+            onSubmit={handleSignIn}
           >
             <TextField
-              id="phone"
-              type="phone"
-              label="Telefone"
+              id="email"
+              type="email"
+              label="Email"
               variant="filled"
               color="primary"
-              value={phone}
-              required
-              onChange={handlePhoneChange}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
             />
 
-            {inputCode && (
-              <TextField
-                id="code"
-                type="text"
-                name="code"
-                variant="filled"
-                value={code}
-                required
-                label="Código"
-                placeholder="Code"
-                onChange={handleCodeChange}
-              />
-            )}
+            <TextField
+              id="password"
+              type="password"
+              label="Password"
+              variant="filled"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
 
             <div>
               <LinkBase
@@ -137,16 +99,12 @@ export function SignIn() {
                 to="/signup"
                 sx={{ fontSize: '0.875rem' }}
               >
-                Esqueci meu número
+                Esqueci minha senha
               </LinkBase>
             </div>
 
             <Button variant="contained" type="submit" disabled={loadingAuth}>
-              {loadingAuth ? (
-                <CircularProgress size={'1.5rem'} />
-              ) : (
-                handleButtonText()
-              )}
+              {loadingAuth ? 'Loading...' : 'Entrar'}
             </Button>
 
             <Typography fontSize="0.875rem" textAlign={'center'}>
@@ -156,7 +114,7 @@ export function SignIn() {
                 to="/signup"
                 sx={{ fontSize: '0.875rem' }}
               >
-                Registre-se
+                Cadastrar
               </LinkBase>
             </Typography>
 
@@ -177,7 +135,7 @@ export function SignIn() {
             alt="Chevrolet"
             mb="2rem"
           />
-          <Typography fontSize="1rem" textAlign={'justify'}>
+          <Typography>
             Lorem ipsum dolor, sit amet consectetur adipisicing elit. Ad
             corrupti velit minus consequuntur repellat nisi. Aut beatae ratione
             vero repudiandae est reprehenderit, tempora ab eos recusandae sit

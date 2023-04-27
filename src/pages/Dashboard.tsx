@@ -1,3 +1,4 @@
+import { Button } from '@mui/material';
 import { useAuth } from '../contexts/auth';
 
 export function Dashboard() {
@@ -13,7 +14,10 @@ export function Dashboard() {
       <br />
       <span>Bem vindo, {user?.name}</span>
       <br />
-      <button onClick={handleLogout}>Logout</button>
+
+      <Button variant="contained" type="submit" onClick={handleLogout}>
+        Sair
+      </Button>
     </div>
   );
 }

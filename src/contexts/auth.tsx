@@ -9,6 +9,10 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut,
+  signInWithPhoneNumber,
+  RecaptchaVerifier,
+  PhoneAuthProvider,
+  signInWithCredential,
 } from 'firebase/auth';
 import { auth, db } from '../services/firebase';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
@@ -35,6 +39,8 @@ interface AuthContexType {
   user: User | null;
   signIn: (user: AuthProps) => Promise<void>;
   signUp: (user: SignUpProps) => Promise<void>;
+  handleSendCode: (phone: string) => Promise<void>;
+  handleVerifyCode: (code: string) => Promise<void>;
   logout: () => Promise<void>;
   signed: boolean;
   loadingAuth: boolean;
@@ -55,6 +61,8 @@ export const useAuth = () => {
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const [verificationId, setVerificationId] = useState('');
+
   const [loadingAuth, setLoadingAuth] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -140,33 +148,66 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } finally {
       setLoadingAuth(false);
     }
+  }
 
-    // await createUserWithEmailAndPassword(auth, email, password)
-    //   .then(async (value) => {
-    //     const uid = value.user.uid;
+  async function handleSendCode(phone: string) {
+    setLoadingAuth(true);
 
-    //     await setDoc(doc(db, 'users', uid), {
-    //       name,
-    //     }).then(() => {
-    //       alert('Cadastrado com sucesso');
+    const recaptchaVerifier = new RecaptchaVerifier(
+      'recaptcha-container',
+      {
+        size: 'invisible',
+        callback: () => {},
+      },
+      auth,
+    );
 
-    //       const userData = {
-    //         name,
-    //         email: value.user.email
-    //       }
+    const number = `+55${phone}`;
 
-    //       setUser(userData)
-    //     });
-    //   })
-    //   .catch((err) => {
-    //     console.log(err);
-    //   })
-    //   .finally(() => {
-    //     setLoaingAuth(false)
-    //   })
-    console.log(name);
-    console.log(email);
-    console.log(password);
+    try {
+      const { verificationId } = await signInWithPhoneNumber(
+        auth,
+        number,
+        recaptchaVerifier,
+      );
+
+      setVerificationId(verificationId);
+    } catch (err) {
+      toast.error('Ops...algo deu errado!');
+      console.log(err);
+    } finally {
+      setLoadingAuth(false);
+    }
+  }
+
+  async function handleVerifyCode(code: string) {
+    setLoadingAuth(true);
+
+    const credential = PhoneAuthProvider.credential(verificationId, code);
+
+    try {
+      await signInWithCredential(auth, credential).then(async (value) => {
+        const uid = value.user.uid;
+
+        const docRef = doc(db, 'users', uid);
+        const docSnap = await getDoc(docRef);
+
+        const data = {
+          uid,
+          name: docSnap.data()?.name,
+          email: value.user.email,
+        };
+
+        setUser(data);
+        setStorageUser(data);
+        navigate('/dashboard');
+      });
+    } catch (err) {
+      toast.error('Ops...algo deu errado!');
+      console.log(err);
+    } finally {
+      setLoadingAuth(false);
+    }
   }
 
   async function logout() {
@@ -184,6 +225,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         signIn,
         signUp,
         logout,
+        handleSendCode,
+        handleVerifyCode,
         loadingAuth,
         loading,
       }}

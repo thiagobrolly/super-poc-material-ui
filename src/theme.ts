@@ -22,6 +22,10 @@ export const theme = createTheme({
               backgroundColor: 'transparent',
               color: '#0FAE79',
             }),
+          boxShadow: 'none',
+          ':hover, :active': {
+            boxShadow: 'none',
+          },
         }),
       },
     },
@@ -36,7 +40,6 @@ export const theme = createTheme({
           '.MuiFilledInput-root': {
             borderRadius: '8px !important',
             border: '2px solid transparent',
-            'box-sizing': 'border-box',
           },
 
           'div.Mui-focused': {
@@ -50,6 +53,16 @@ export const theme = createTheme({
           },
           label: {
             color: '#999999',
+          },
+        },
+      },
+    },
+    MuiLink: {
+      styleOverrides: {
+        root: {
+          textDecoration: 'none',
+          ':hover': {
+            color: '#00875A',
           },
         },
       },
