@@ -1,10 +1,4 @@
-import {
-  ReactNode,
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-} from 'react';
+import { ReactNode, createContext, useEffect, useState } from 'react';
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
@@ -45,23 +39,15 @@ interface AuthContexType {
   signed: boolean;
   loadingAuth: boolean;
   loading: boolean;
+  visibleCodeInput: boolean;
 }
 
 export const AuthContext = createContext({} as AuthContexType);
 
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-
-  return context;
-};
-
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [verificationId, setVerificationId] = useState('');
+  const [visibleCodeInput, setVisibleCodeInput] = useState(false);
 
   const [loadingAuth, setLoadingAuth] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -172,6 +158,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       );
 
       setVerificationId(verificationId);
+      setVisibleCodeInput(true);
     } catch (err) {
       toast.error('Ops...algo deu errado!');
       console.log(err);
@@ -229,6 +216,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         handleVerifyCode,
         loadingAuth,
         loading,
+        visibleCodeInput,
       }}
     >
       {children}

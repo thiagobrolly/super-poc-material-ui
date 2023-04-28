@@ -1,6 +1,5 @@
 import { useState, FormEvent, ChangeEvent } from 'react';
 import { Link } from 'react-router-dom';
-import { useAuth } from '../contexts/auth';
 import {
   Box,
   Button,
@@ -11,6 +10,7 @@ import {
 } from '@mui/material';
 
 import Logo from '../assets/logo.svg';
+import { useAuth } from '../hooks/useAuth';
 
 // xs, extra-small: 0px
 // sm, small: 600px
@@ -21,14 +21,14 @@ import Logo from '../assets/logo.svg';
 export function SignIn() {
   const [code, setCode] = useState('');
   const [phone, setPhone] = useState('');
-  const [inputCode, setInputCode] = useState(false);
 
-  const { handleSendCode, handleVerifyCode, loadingAuth } = useAuth();
+  const { handleSendCode, handleVerifyCode, loadingAuth, visibleCodeInput } =
+    useAuth();
 
   async function handleOTP(e: FormEvent) {
     e.preventDefault();
 
-    await handleSendCode(phone).then(() => setInputCode(true));
+    await handleSendCode(phone);
   }
 
   async function handleVerify(e: FormEvent) {
@@ -56,7 +56,7 @@ export function SignIn() {
   }
 
   function handleButtonText() {
-    if (inputCode) {
+    if (visibleCodeInput) {
       return 'Entrar';
     } else {
       return 'Entre com seu número';
@@ -104,7 +104,7 @@ export function SignIn() {
             display={'flex'}
             flexDirection={'column'}
             gap={'.75rem'}
-            onSubmit={!inputCode ? handleOTP : handleVerify}
+            onSubmit={!visibleCodeInput ? handleOTP : handleVerify}
           >
             <TextField
               id="phone"
@@ -117,7 +117,7 @@ export function SignIn() {
               onChange={handlePhoneChange}
             />
 
-            {inputCode && (
+            {visibleCodeInput && (
               <TextField
                 id="code"
                 type="text"
@@ -174,7 +174,7 @@ export function SignIn() {
             component="img"
             width={{ xs: '18.75rem', sm: '22.5rem' }}
             src={Logo}
-            alt="Chevrolet"
+            alt="Super Frete"
             mb="2rem"
           />
           <Typography fontSize="1rem" textAlign={'justify'}>
