@@ -1,6 +1,6 @@
 import { ReactElement } from 'react';
 import { Navigate } from 'react-router-dom';
-import { useAuth } from '../contexts/auth';
+import { useAuth } from '../hooks/useAuth';
 
 export function Private({ children }: { children: ReactElement }) {
   const { signed, loading } = useAuth();

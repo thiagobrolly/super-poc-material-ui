@@ -1,5 +1,5 @@
 import { Button } from '@mui/material';
-import { useAuth } from '../contexts/auth';
+import { useAuth } from '../hooks/useAuth';
 
 export function Dashboard() {
   const { user, logout } = useAuth();

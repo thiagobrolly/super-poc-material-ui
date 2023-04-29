@@ -1,6 +1,5 @@
 import { useState, FormEvent } from 'react';
 import { Link } from 'react-router-dom';
-import { useAuth } from '../contexts/auth';
 import {
   Box,
   Button,
@@ -11,6 +10,7 @@ import {
 } from '@mui/material';
 
 import Logo from '../assets/logo.svg';
+import { useAuth } from '../hooks/useAuth';
 
 export function SignUp() {
   const [name, setName] = useState('');
