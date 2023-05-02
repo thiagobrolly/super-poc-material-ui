@@ -13,5 +13,10 @@ export default defineConfig({
     setupFiles: ['setupTests.ts'],
     css: true,
     reporters: ['verbose'],
+    coverage: {
+      provider: 'c8',
+      all: true,
+      include: ['src/**/*.tsx'],
+    },
   },
 });
