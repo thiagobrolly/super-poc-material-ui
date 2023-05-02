@@ -9,14 +9,7 @@ export function RoutesApp() {
     <Routes>
       <Route path="/" element={<SignIn />} />
       <Route path="/signup" element={<SignUp />} />
-      <Route
-        path="/dashboard"
-        element={
-          <Private>
-            <Dashboard />
-          </Private>
-        }
-      />
+      <Route path="/dashboard" element={<Private element={<Dashboard />} />} />
     </Routes>
   );
 }

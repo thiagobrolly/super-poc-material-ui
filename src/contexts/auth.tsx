@@ -60,6 +60,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       if (storageUser) {
         setUser(JSON.parse(storageUser));
+        navigate('/dashboard');
         setLoading(false);
       }
 
@@ -67,7 +68,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     loadUser();
-  }, []);
+  }, [navigate]);
 
   function setStorageUser(data: User) {
     localStorage.setItem('@tickets2.0', JSON.stringify(data));
@@ -201,7 +202,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await signOut(auth);
     localStorage.removeItem('@tickets2.0');
     setUser(null);
-    navigate('/');
+    navigate('/dashboard');
   }
 
   return (
